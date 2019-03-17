@@ -2,6 +2,7 @@ package com.syouth.telegramapp.view;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -50,6 +51,17 @@ public class SummaryView extends ViewGroup {
                 5,
                 getResources().getDisplayMetrics()));
         addView(mTitle);
+    }
+
+    public void setNightMode(boolean enabled) {
+        if (enabled) {
+            mTitle.setTextColor(Color.WHITE);
+            DrawableCompat.setTint(getBackground(), Color.parseColor("#212B35"));
+        } else {
+            mTitle.setTextColor(Color.BLACK);
+            DrawableCompat.setTint(getBackground(), Color.WHITE);
+        }
+        invalidate();
     }
 
     @Override

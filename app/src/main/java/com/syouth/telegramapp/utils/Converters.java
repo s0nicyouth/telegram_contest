@@ -22,6 +22,14 @@ public class Converters {
         return res;
     }
 
+    public static float[] toArrayFloat(List<Float> list) {
+        float[] res = new float[list.size()];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = list.get(i);
+        }
+        return res;
+    }
+
     private static long[] findXValues(Chart chart) {
         for (Chart.Column c : chart.columns) {
             String type = Objects.requireNonNull(chart.types.get(c.label));

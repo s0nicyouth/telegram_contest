@@ -38,6 +38,10 @@ public class SummaryRenderer {
                         mSummary.getResources().getDisplayMetrics()));
     }
 
+    public void setNightMode(boolean enabled) {
+        mSummary.setNightMode(enabled);
+    }
+
     public void render(@Nullable GraphView.ChartDetails chartDetails) {
         if (chartDetails == null) {
             mSummary.setVisibility(View.INVISIBLE);
@@ -62,12 +66,12 @@ public class SummaryRenderer {
             if (newPos + width < mContainer.getWidth()) {
                 FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mSummary.getLayoutParams();
                 lp.setMargins((int) (chartDetails.positionXInView + mSummaryPadding),
-                        0, 0, 0);
+                        (int) mSummaryPadding, 0, 0);
                 mSummary.setLayoutParams(lp);
             } else {
                 FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mSummary.getLayoutParams();
                 lp.setMargins((int) (chartDetails.positionXInView - mSummaryPadding - width),
-                        0, 0, 0);
+                        (int) mSummaryPadding, 0, 0);
                 mSummary.setLayoutParams(lp);
             }
         }

@@ -1,9 +1,13 @@
 package com.syouth.telegramapp;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.syouth.telegramapp.controllers.ChartController;
 import com.syouth.telegramapp.view.GraphView;
@@ -23,8 +27,11 @@ public class ChartView extends AppCompatActivity implements GraphsView {
     private GraphView mGraphMap;
     private RecyclerView mChartsList;
     private SummaryRenderer mSummaryRenderer;
+    private Toolbar mToolbar;
 
     private ChartController mController;
+
+    private boolean mNightMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +53,40 @@ public class ChartView extends AppCompatActivity implements GraphsView {
             Date dt = new Date(TimeUnit.SECONDS.toMillis(val));
             return sdt.format(dt);
         });
+        mGraphView.setTitle("Followers");
+
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mToolbar.setTitleTextColor(Color.WHITE);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    private void changeNightMode() {
+        mNightMode = !mNightMode;
+        mGraphView.setNightMode(mNightMode);
+        mSlider.setNightMode(mNightMode);
+        mSummaryRenderer.setNightMode(mNightMode);
+        if (mNightMode) {
+            findViewById(R.id.background).setBackgroundColor(Color.parseColor("#212B35"));
+            mToolbar.setBackgroundColor(Color.parseColor("#24313D"));
+        } else {
+            findViewById(R.id.background).setBackgroundColor(Color.WHITE);
+            mToolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.night_mode) {
+            changeNightMode();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

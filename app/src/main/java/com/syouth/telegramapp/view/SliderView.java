@@ -29,7 +29,7 @@ public class SliderView extends View {
 
     private float mDraggerWidth;
 
-    private final Paint mGrayPaint = new Paint();
+    private final Paint mBorderPaint = new Paint();
 
     public SliderView(Context context) {
         super(context);
@@ -93,13 +93,22 @@ public class SliderView extends View {
 
     private void init() {
         setBackgroundColor(Color.TRANSPARENT);
-        mGrayPaint.setStyle(Paint.Style.FILL);
-        mGrayPaint.setAntiAlias(true);
-        mGrayPaint.setColor(Color.BLUE);
+        mBorderPaint.setStyle(Paint.Style.FILL);
+        mBorderPaint.setAntiAlias(true);
+        mBorderPaint.setColor(Color.BLUE);
 
         mDraggerWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 DRAGGER_LINE_SIDTH,
                 getResources().getDisplayMetrics());
+    }
+
+    public void setNightMode(boolean enabled) {
+        if (enabled) {
+            mBorderPaint.setColor(Color.LTGRAY);
+        } else {
+            mBorderPaint.setColor(Color.BLUE);
+        }
+        invalidate();
     }
 
     private float getLeftEnd() {
@@ -114,26 +123,26 @@ public class SliderView extends View {
     protected void onDraw(Canvas canvas) {
         float leftSideEnd = getLeftEnd();
         float rightSideEnd = getRightEnd();
-        mGrayPaint.setAlpha(10);
-        canvas.drawRect(0,0, leftSideEnd, getHeight(), mGrayPaint);
-        mGrayPaint.setAlpha(50);
+        mBorderPaint.setAlpha(10);
+        canvas.drawRect(0,0, leftSideEnd, getHeight(), mBorderPaint);
+        mBorderPaint.setAlpha(50);
         canvas.drawRect(leftSideEnd, 0,
                 leftSideEnd + mDraggerWidth, getHeight(),
-                mGrayPaint);
+                mBorderPaint);
         canvas.drawRect(rightSideEnd - mDraggerWidth,0,
                 rightSideEnd, getHeight(),
-                mGrayPaint);
-        mGrayPaint.setAlpha(10);
+                mBorderPaint);
+        mBorderPaint.setAlpha(10);
         canvas.drawRect(rightSideEnd,0,
                 getWidth(), getHeight(),
-                mGrayPaint);
-        mGrayPaint.setAlpha(50);
+                mBorderPaint);
+        mBorderPaint.setAlpha(50);
         canvas.drawRect(leftSideEnd + mDraggerWidth, 0,
                 rightSideEnd - mDraggerWidth, mDraggerWidth / 4,
-                mGrayPaint);
+                mBorderPaint);
         canvas.drawRect(leftSideEnd + mDraggerWidth, getHeight() - mDraggerWidth / 4,
                 rightSideEnd - mDraggerWidth, getHeight(),
-                mGrayPaint);
+                mBorderPaint);
     }
 
     @Override

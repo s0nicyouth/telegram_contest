@@ -5,7 +5,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -114,7 +116,9 @@ public class GraphView extends View implements View.OnTouchListener {
     private final Paint mLinesPaint = new Paint();
     private final Paint mTextPaint = new Paint();
     private final Paint mCirclesPaint = new Paint();
+    private final Paint mTitlePaint = new Paint();
     private final Path mGraphPath = new Path();
+    private float[] mPointsToDraw;
 
     private int mBottomPadding;
     private int mTopPadding;
@@ -124,8 +128,14 @@ public class GraphView extends View implements View.OnTouchListener {
 
     private boolean mJustDrawGraph = false;
 
+    @Nullable
+    private String mTitle;
+    private final Rect mTextRect = new Rect();
+
     private XValueInterpolator mXInterpolator = String::valueOf;
     private ChartTouchListener mChartTouchListener = ChartTouchListener.NULL;
+
+    private int mBackgroundColor = Color.WHITE;
 
     public GraphView(Context context) {
         super(context);
@@ -152,6 +162,14 @@ public class GraphView extends View implements View.OnTouchListener {
             invalidate();
             return;
         }
+        int maxSize = 0;
+        for (Chart c : mCharts) {
+            for (LineData ld : c.lines) {
+                // Maximum possible size of points array
+                maxSize = Math.max(maxSize, 4 + (ld.vals.length - 2) * 4);
+            }
+        }
+        mPointsToDraw = new float[maxSize];
         updateMaxMinX();
         updateMaxMinY();
         invalidate();
@@ -191,6 +209,22 @@ public class GraphView extends View implements View.OnTouchListener {
         mChartTouchListener.changed(mChartDetails);
     }
 
+    public void setNightMode(boolean enabled) {
+        if (enabled) {
+            int bgColor = Color.parseColor("#212B35");
+            mBackgroundColor = bgColor;
+            mTextPaint.setColor(Color.LTGRAY);
+            mTextPaint.setAlpha(50);
+            mLinesPaint.setColor(Color.BLACK);
+        } else {
+            mBackgroundColor = Color.WHITE;
+            mTextPaint.setColor(Color.GRAY);
+            mTextPaint.setAlpha(255);
+            mLinesPaint.setColor(Color.GRAY);
+        }
+        invalidate();
+    }
+
     /**
      * Sets amount of data which is scrolled from the left
      * @param lRatio amount to scroll.
@@ -214,6 +248,11 @@ public class GraphView extends View implements View.OnTouchListener {
             mRightRatio = 1 - mLeftRatio;
         }
         updateMaxMinY();
+        invalidate();
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
         invalidate();
     }
 
@@ -311,6 +350,10 @@ public class GraphView extends View implements View.OnTouchListener {
         mCirclesPaint.setAntiAlias(true);
         mCirclesPaint.setStyle(Paint.Style.STROKE);
         mCirclesPaint.setStrokeWidth(mStrokeWidth);
+
+        mTitlePaint.setColor(Color.parseColor("#4B97C7"));
+        mTitlePaint.setAntiAlias(true);
+        mTitlePaint.setTextSize(50);
 
         setOnTouchListener(this);
     }
@@ -430,6 +473,37 @@ public class GraphView extends View implements View.OnTouchListener {
         }
     }
 
+    private int constructPoints(long[] yVals, long[] xs) {
+        int posToDrawFrom = getFirstVisibleXPosition(xs, getMinXConsideringRatio());
+        int posToDrawTo = getLastVisibleXPosition(xs, getMaxXConsideringRatio());
+        mPointsToDraw[0] = getPixelsXByPlotX(xs[posToDrawFrom]);
+        mPointsToDraw[1] = getHeight() - getPixelsYByPlotY(yVals[posToDrawFrom]);
+        mPointsToDraw[2] = getPixelsXByPlotX(xs[posToDrawFrom + 1]);
+        mPointsToDraw[3] = getHeight() - getPixelsYByPlotY(yVals[posToDrawFrom + 1]);
+        for (int i = posToDrawFrom + 2; i <= posToDrawTo; i++) {
+            int realPos = (i - posToDrawFrom - 2) * 4 + 4;
+            mPointsToDraw[realPos] = mPointsToDraw[realPos - 2];
+            mPointsToDraw[realPos + 1] = mPointsToDraw[realPos - 1];
+            mPointsToDraw[realPos + 2] = getPixelsXByPlotX(xs[i]);
+            mPointsToDraw[realPos + 3] = getHeight() - getPixelsYByPlotY(yVals[i]);
+        }
+
+
+        return 4 + (posToDrawTo - posToDrawFrom - 1) * 4;
+    }
+
+    private void drawChartsWithLines(Canvas canvas, List<Chart> charts) {
+        for (Chart c : charts) {
+            for (LineData ld : c.lines) {
+                if (ld.enabled) {
+                    int count = constructPoints(ld.vals, c.x);
+                    mPaint.setColor(ld.color);
+                    canvas.drawLines(mPointsToDraw, 0, count, mPaint);
+                }
+            }
+        }
+    }
+
     private void drawLevelLines(Canvas canvas) {
         long gap = ((mMaxY - mMinY) / NUMBER_OF_LEVEL_LINES);
         for (int i = 0; i <= NUMBER_OF_LEVEL_LINES; i++) {
@@ -473,7 +547,7 @@ public class GraphView extends View implements View.OnTouchListener {
                 mCirclesPaint.setStyle(Paint.Style.STROKE);
                 canvas.drawCircle(lineX, getHeight() - getPixelsYByPlotY(y),
                         mCircleRadius, mCirclesPaint);
-                mCirclesPaint.setColor(Color.WHITE);
+                mCirclesPaint.setColor(mBackgroundColor);
                 mCirclesPaint.setStyle(Paint.Style.FILL);
                 canvas.drawCircle(lineX, getHeight() - getPixelsYByPlotY(y),
                         mCircleRadius - mCirclesPaint.getStrokeWidth() / 2, mCirclesPaint);
@@ -528,6 +602,13 @@ public class GraphView extends View implements View.OnTouchListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (mBackgroundColor != Color.WHITE) {
+            canvas.drawColor(mBackgroundColor);
+        }
+        if (!TextUtils.isEmpty(mTitle)) {
+            mTitlePaint.getTextBounds(mTitle, 0, mTitle.length(), mTextRect);
+            canvas.drawText(mTitle, 0, mTextRect.height(), mTitlePaint);
+        }
         if (mCharts == null) {
             canvas.drawColor(Color.WHITE);
             return;
@@ -537,9 +618,13 @@ public class GraphView extends View implements View.OnTouchListener {
             drawLevelLines(canvas);
             drawXMarks(canvas);
         }
-        for (Chart c : mCharts) {
+        /**
+         * It's a slow implementation.
+         */
+        /*for (Chart c : mCharts) {
             drawChart(canvas, c);
-        }
+        }*/
+        drawChartsWithLines(canvas, mCharts);
         if (!mJustDrawGraph) {
             drawChatsTouchData(canvas);
         }

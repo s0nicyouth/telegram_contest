@@ -1,46 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:fitsSystemWindows="true" >
 
-    <FrameLayout
-        android:id="@+id/container"
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="6" >
-        <com.syouth.telegramapp.view.SummaryView
-            android:id="@+id/summary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <com.syouth.telegramapp.view.GraphView
-            android:id="@+id/graph"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"/>
-    </FrameLayout>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp" >
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-        <com.syouth.telegramapp.view.GraphView
-            android:id="@+id/slided_graph"
+        <FrameLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-        <com.syouth.telegramapp.view.SliderView
-            android:id="@+id/slider"
+            android:layout_height="0dp"
+            android:layout_weight="6" >
+            <com.syouth.telegramapp.view.SummaryView
+                android:id="@+id/summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <com.syouth.telegramapp.view.GraphView
+                android:id="@+id/graph"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"/>
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </FrameLayout>
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <com.syouth.telegramapp.view.GraphView
+                android:id="@+id/slided_graph"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+            <com.syouth.telegramapp.view.SliderView
+                android:id="@+id/slider"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/charts_list"
-        android:paddingTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/charts_list"
+            android:paddingTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3">
 
-    </android.support.v7.widget.RecyclerView>
+        </android.support.v7.widget.RecyclerView>
 
+    </LinearLayout>
 </LinearLayout>

@@ -25,6 +25,8 @@ public class ChartController implements SliderView.RatioChangeListener {
             .build();
     private final Handler mMainThread = new Handler(Looper.getMainLooper());
 
+    private boolean mNightMode = false;
+
     public ChartController(GraphsView graphsView) {
         HandlerThread handlerThread = new HandlerThread("Bg");
         handlerThread.start();
