@@ -1,5 +1,8 @@
 package com.syouth.telegramapp.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -137,6 +140,9 @@ public class GraphView extends View implements View.OnTouchListener {
 
     private int mBackgroundColor = Color.WHITE;
 
+    private ValueAnimator mMaxYAnimator;
+    private ValueAnimator mMinYAnimator;
+
     public GraphView(Context context) {
         super(context);
         init();
@@ -199,9 +205,52 @@ public class GraphView extends View implements View.OnTouchListener {
         if (mCharts == null) {
             return;
         }
+        long prevMaxY = mMaxY;
+        long prevMinY = mMinY;
         long[] maxMinY = findMaxMinYInCurrentBounds(mCharts);
         mMaxY = maxMinY[0];
         mMinY = maxMinY[1] < 0 ? maxMinY[1] : 0;
+        if ((mMaxYAnimator == null || !mMaxYAnimator.isRunning()) && prevMaxY != mMaxY) {
+            mMaxYAnimator = ValueAnimator.ofFloat(prevMaxY, mMaxY);
+            mMaxYAnimator.setDuration(500);
+            mMaxYAnimator.addUpdateListener(animation -> {
+                float val = (float) animation.getAnimatedValue();
+                mMaxY = (long) val;
+                super.invalidate();
+            });
+            mMaxYAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    invalidate();
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    invalidate();
+                }
+            });
+            mMaxYAnimator.start();
+        } else if ((mMinYAnimator == null || !mMinYAnimator.isRunning()) && prevMinY != mMinY) {
+            mMinYAnimator = ValueAnimator.ofFloat(prevMinY, mMinY);
+            mMaxYAnimator.setDuration(500);
+            mMaxYAnimator.addUpdateListener(animation -> {
+                float val = (float) animation.getAnimatedValue();
+                mMinY = (long) val;
+                super.invalidate();
+            });
+            mMinYAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    invalidate();
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    invalidate();
+                }
+            });
+            mMinYAnimator.start();
+        }
     }
 
     public void setChartTouchListener(ChartTouchListener listener) {
