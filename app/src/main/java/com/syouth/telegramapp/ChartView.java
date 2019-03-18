@@ -48,8 +48,9 @@ public class ChartView extends AppCompatActivity implements GraphsView {
 
         mController = new ChartController(this);
         DateFormat sdt = new SimpleDateFormat("MMM dd");
+        Date dt = new Date();
         mGraphView.setXValueInterpolator(val -> {
-            Date dt = new Date(val);
+            dt.setTime(val);
             return sdt.format(dt);
         });
         mGraphView.setTitle("Followers");

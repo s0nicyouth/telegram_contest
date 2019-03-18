@@ -22,6 +22,7 @@ public class SummaryRenderer {
     private final SummaryView mSummary;
     private final FrameLayout mContainer;
     private final SimpleDateFormat mDateFormatter = new SimpleDateFormat("EEE, MMM dd");
+    private final Date mDate = new Date();
     private final float mSummaryPadding;
 
     public SummaryRenderer(SummaryView summaryView, FrameLayout container) {
@@ -74,7 +75,7 @@ public class SummaryRenderer {
                 mSummary.setLayoutParams(lp);
             }
         }
-        Date title = new Date(chartDetails.chart.x[chartDetails.closestPosition]);
-        mSummary.setTitle(mDateFormatter.format(title));
+        mDate.setTime(chartDetails.chart.x[chartDetails.closestPosition]);
+        mSummary.setTitle(mDateFormatter.format(mDate));
     }
 }
