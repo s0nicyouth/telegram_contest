@@ -145,6 +145,8 @@ public class GraphView extends View implements View.OnTouchListener {
     private ValueAnimator mMaxYAnimator;
     private ValueAnimator mMinYAnimator;
 
+    private boolean mSkipFrame = false;
+
     public GraphView(Context context) {
         super(context);
         init();
@@ -565,16 +567,23 @@ public class GraphView extends View implements View.OnTouchListener {
     private void drawLevelLines(Canvas canvas) {
         long gap = ((mMaxY - mMinY) / NUMBER_OF_LEVEL_LINES);
         for (int i = 0; i <= NUMBER_OF_LEVEL_LINES; i++) {
-            canvas.drawText(String.valueOf(mMinY + gap * i),
-                    0f,
-                    getHeight() - (yIntervalToPixels(gap * i) + mLevelValuePadding),
-                    mTextPaint);
-            canvas.drawLine(
-                    0f,
-                    getHeight() - yIntervalToPixels(i * gap),
-                    getWidth(), getHeight() - yIntervalToPixels(gap * i),
-                    mLinesPaint);
+            if (shouldDrawFrame()) {
+                canvas.drawText(String.valueOf(mMinY + gap * i),
+                        0f,
+                        getHeight() - (yIntervalToPixels(gap * i) + mLevelValuePadding),
+                        mTextPaint);
+            }
+                canvas.drawLine(
+                        0f,
+                        getHeight() - yIntervalToPixels(i * gap),
+                        getWidth(), getHeight() - yIntervalToPixels(gap * i),
+                        mLinesPaint);
         }
+    }
+
+    private boolean shouldDrawFrame() {
+        return !mSkipFrame || (mMaxYAnimator != null && !mMaxYAnimator.isRunning())
+                || (mMinYAnimator != null && !mMinYAnimator.isRunning());
     }
 
     private void drawXMarks(Canvas canvas) {
@@ -694,6 +703,7 @@ public class GraphView extends View implements View.OnTouchListener {
         if (!mJustDrawGraph) {
             drawChatsTouchData(canvas);
         }
+        mSkipFrame = !mSkipFrame;
     }
 
     @Override
