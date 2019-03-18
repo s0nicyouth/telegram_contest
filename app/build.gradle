@@ -9,7 +9,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.syouth.telegramapp"
+        applicationId "com.syouth.telegram_charts"
         minSdkVersion 17
         targetSdkVersion 28
         versionCode 1
