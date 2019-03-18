@@ -82,11 +82,17 @@ public class ChartView extends AppCompatActivity implements GraphsView {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.night_mode) {
-            changeNightMode();
-            return true;
+        switch (item.getItemId()) {
+            case R.id.night_mode:
+                changeNightMode();
+                return true;
+            case R.id.change_rendering_mode:
+                mGraphView.setRenderingModeGpu(!mGraphView.getRenderingModeGpu());
+                mGraphMap.setRenderingModeGpu(!mGraphView.getRenderingModeGpu());
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

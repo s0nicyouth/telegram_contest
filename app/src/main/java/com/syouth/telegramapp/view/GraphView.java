@@ -140,6 +140,8 @@ public class GraphView extends View implements View.OnTouchListener {
 
     private int mBackgroundColor = Color.WHITE;
 
+    private boolean mRenderingModeGpu = true;
+
     private ValueAnimator mMaxYAnimator;
     private ValueAnimator mMinYAnimator;
 
@@ -253,6 +255,14 @@ public class GraphView extends View implements View.OnTouchListener {
         }
     }
 
+    public void setRenderingModeGpu(boolean enabled) {
+        mRenderingModeGpu = enabled;
+    }
+
+    public boolean getRenderingModeGpu() {
+        return mRenderingModeGpu;
+    }
+
     public void setChartTouchListener(ChartTouchListener listener) {
         mChartTouchListener = listener;
         mChartTouchListener.changed(mChartDetails);
@@ -260,8 +270,7 @@ public class GraphView extends View implements View.OnTouchListener {
 
     public void setNightMode(boolean enabled) {
         if (enabled) {
-            int bgColor = Color.parseColor("#212B35");
-            mBackgroundColor = bgColor;
+            mBackgroundColor = Color.parseColor("#212B35");
             mTextPaint.setColor(Color.LTGRAY);
             mTextPaint.setAlpha(50);
             mLinesPaint.setColor(Color.BLACK);
@@ -667,13 +676,21 @@ public class GraphView extends View implements View.OnTouchListener {
             drawLevelLines(canvas);
             drawXMarks(canvas);
         }
-        /**
-         * It's a slow implementation.
+        /*
+          Different rendering modes may produce different results.
+          Although Gpu rendering(using drawLines) should be faster because it skips
+          rendering to bitmap but I've found that on some devices(COL-L29 for example)
+          it's slower(I suspect that it's something wrong with the device because rendering there
+          is slow in general).
+          This mode can be changed using toolbar switch.
          */
-        /*for (Chart c : mCharts) {
-            drawChart(canvas, c);
-        }*/
-        drawChartsWithLines(canvas, mCharts);
+        if (!mRenderingModeGpu) {
+            for (Chart c : mCharts) {
+                drawChart(canvas, c);
+            }
+        } else {
+            drawChartsWithLines(canvas, mCharts);
+        }
         if (!mJustDrawGraph) {
             drawChatsTouchData(canvas);
         }

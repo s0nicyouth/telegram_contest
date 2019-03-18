@@ -7,4 +7,8 @@
         android:icon="@drawable/moon_icon_drawable"
         app:showAsAction="always"
         android:title="Night mode" />
+    <item
+        android:id="@+id/change_rendering_mode"
+        android:orderInCategory="200"
+        android:title="Change rendering mode" />
 </menu>
