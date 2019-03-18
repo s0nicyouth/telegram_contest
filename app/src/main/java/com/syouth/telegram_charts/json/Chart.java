@@ -13,8 +13,8 @@ public class Chart {
 
     public Map<String, String> colors;
 
-    public Chart(List<Column> columns, Map<String, String> types,
-                 Map<String, String> names, Map<String, String> colors) {
+    Chart(List<Column> columns, Map<String, String> types,
+          Map<String, String> names, Map<String, String> colors) {
         this.columns = columns;
         this.types = types;
         this.names = names;
@@ -25,7 +25,7 @@ public class Chart {
         public String label;
         public List<Long> vals;
 
-        public Column(String label, List<Long> vals) {
+        Column(String label, List<Long> vals) {
             this.label = label;
             this.vals = vals;
         }
