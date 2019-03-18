@@ -121,6 +121,29 @@ public class GraphView extends View implements View.OnTouchListener {
     private final Paint mCirclesPaint = new Paint();
     private final Paint mTitlePaint = new Paint();
     private final Path mGraphPath = new Path();
+    private final long[] mMaxMinResult = new long[2];
+    private final ValueAnimator.AnimatorListener mAnimatorListener = new AnimatorListenerAdapter() {
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            invalidate();
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            invalidate();
+        }
+    };
+    private final ValueAnimator.AnimatorUpdateListener mMinYUpdateListener = animation -> {
+        float val = (float) animation.getAnimatedValue();
+        mMinY = (long) val;
+        super.invalidate();
+    };
+    private final ValueAnimator.AnimatorUpdateListener mMaxYUpdateListener = animation -> {
+        float val = (float) animation.getAnimatedValue();
+        mMaxY = (long) val;
+        super.invalidate();
+    };
+
     private float[] mPointsToDraw;
 
     private int mBottomPadding;
@@ -217,42 +240,15 @@ public class GraphView extends View implements View.OnTouchListener {
         if ((mMaxYAnimator == null || !mMaxYAnimator.isRunning()) && prevMaxY != mMaxY) {
             mMaxYAnimator = ValueAnimator.ofFloat(prevMaxY, mMaxY);
             mMaxYAnimator.setDuration(500);
-            mMaxYAnimator.addUpdateListener(animation -> {
-                float val = (float) animation.getAnimatedValue();
-                mMaxY = (long) val;
-                super.invalidate();
-            });
-            mMaxYAnimator.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    invalidate();
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    invalidate();
-                }
-            });
+            mMaxYAnimator.addUpdateListener(mMaxYUpdateListener);
+            mMaxYAnimator.addListener(mAnimatorListener);
             mMaxYAnimator.start();
-        } else if ((mMinYAnimator == null || !mMinYAnimator.isRunning()) && prevMinY != mMinY) {
+        }
+        if ((mMinYAnimator == null || !mMinYAnimator.isRunning()) && prevMinY != mMinY) {
             mMinYAnimator = ValueAnimator.ofFloat(prevMinY, mMinY);
             mMaxYAnimator.setDuration(500);
-            mMaxYAnimator.addUpdateListener(animation -> {
-                float val = (float) animation.getAnimatedValue();
-                mMinY = (long) val;
-                super.invalidate();
-            });
-            mMinYAnimator.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    invalidate();
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    invalidate();
-                }
-            });
+            mMaxYAnimator.addUpdateListener(mMinYUpdateListener);
+            mMinYAnimator.addListener(mAnimatorListener);
             mMinYAnimator.start();
         }
     }
@@ -442,7 +438,9 @@ public class GraphView extends View implements View.OnTouchListener {
             }
         }
 
-        return new long[] {max, min};
+        mMaxMinResult[0] = max;
+        mMaxMinResult[1] = min;
+        return mMaxMinResult;
     }
 
     private long[] findMaxMinYInCurrentBounds(List<Chart> charts) {
@@ -464,7 +462,9 @@ public class GraphView extends View implements View.OnTouchListener {
             }
         }
 
-        return new long[] {max, min};
+        mMaxMinResult[0] = max;
+        mMaxMinResult[1] = min;
+        return mMaxMinResult;
     }
 
     private long[] findMaxMinInBounds(long[] y, int l, int r) {
@@ -479,7 +479,9 @@ public class GraphView extends View implements View.OnTouchListener {
             }
         }
 
-        return new long[] {max, min};
+        mMaxMinResult[0] = max;
+        mMaxMinResult[1] = min;
+        return mMaxMinResult;
     }
 
     private boolean isChartEnabled(Chart chart) {

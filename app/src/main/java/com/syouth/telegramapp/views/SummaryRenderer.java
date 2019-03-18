@@ -14,7 +14,6 @@ import com.syouth.telegramapp.view.SummaryView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 public class SummaryRenderer {
 
@@ -75,8 +74,7 @@ public class SummaryRenderer {
                 mSummary.setLayoutParams(lp);
             }
         }
-        Date title = new Date(TimeUnit.SECONDS.toMillis(
-                chartDetails.chart.x[chartDetails.closestPosition]));
+        Date title = new Date(chartDetails.chart.x[chartDetails.closestPosition]);
         mSummary.setTitle(mDateFormatter.format(title));
     }
 }

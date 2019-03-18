@@ -18,7 +18,6 @@ import com.syouth.telegramapp.views.SummaryRenderer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 public class ChartView extends AppCompatActivity implements GraphsView {
 
@@ -50,7 +49,7 @@ public class ChartView extends AppCompatActivity implements GraphsView {
         mController = new ChartController(this);
         DateFormat sdt = new SimpleDateFormat("MMM dd");
         mGraphView.setXValueInterpolator(val -> {
-            Date dt = new Date(TimeUnit.SECONDS.toMillis(val));
+            Date dt = new Date(val);
             return sdt.format(dt);
         });
         mGraphView.setTitle("Followers");
