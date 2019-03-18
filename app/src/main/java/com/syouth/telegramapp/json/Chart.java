@@ -1,23 +1,25 @@
-package com.syouth.telegramapp.moshi;
-
-import com.squareup.moshi.Json;
+package com.syouth.telegramapp.json;
 
 import java.util.List;
 import java.util.Map;
 
 public class Chart {
 
-    @Json(name = "columns")
     public List<Column> columns;
 
-    @Json(name = "types")
     public Map<String, String> types;
 
-    @Json(name = "names")
     public Map<String, String> names;
 
-    @Json(name = "colors")
     public Map<String, String> colors;
+
+    public Chart(List<Column> columns, Map<String, String> types,
+                 Map<String, String> names, Map<String, String> colors) {
+        this.columns = columns;
+        this.types = types;
+        this.names = names;
+        this.colors = colors;
+    }
 
     public static class Column {
         public String label;

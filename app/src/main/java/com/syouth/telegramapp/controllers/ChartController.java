@@ -5,9 +5,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 
-import com.squareup.moshi.Moshi;
 import com.syouth.telegramapp.adapters.ChartsAdapter;
-import com.syouth.telegramapp.moshi.ColumnAdapter;
 import com.syouth.telegramapp.utils.Data;
 import com.syouth.telegramapp.view.GraphView;
 import com.syouth.telegramapp.view.SliderView;
@@ -19,13 +17,7 @@ public class ChartController implements SliderView.RatioChangeListener {
 
     private final GraphsView mView;
     private final ChartsAdapter mChartsAdapter = new ChartsAdapter();
-    private final Moshi mMoshi = new Moshi
-            .Builder()
-            .add(new ColumnAdapter.ColumsAdapterFactory())
-            .build();
     private final Handler mMainThread = new Handler(Looper.getMainLooper());
-
-    private boolean mNightMode = false;
 
     public ChartController(GraphsView graphsView) {
         HandlerThread handlerThread = new HandlerThread("Bg");
@@ -37,7 +29,7 @@ public class ChartController implements SliderView.RatioChangeListener {
         mView.getGraphMap().setJustDrawGraph(true);
 
         bgThread.post(() -> {
-            List<GraphView.Chart> data = Data.getData(mView.getAssets(), mMoshi);
+            List<GraphView.Chart> data = Data.getData(mView.getAssets());
             mMainThread.post(() -> {
                 mView.getGraphMap().setData(data);
                 mView.getGraphView().setData(data);

@@ -2,7 +2,7 @@ package com.syouth.telegramapp.utils;
 
 import android.graphics.Color;
 
-import com.syouth.telegramapp.moshi.Chart;
+import com.syouth.telegramapp.json.Chart;
 import com.syouth.telegramapp.view.GraphView;
 
 import java.util.ArrayList;
