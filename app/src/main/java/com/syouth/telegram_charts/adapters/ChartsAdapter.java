@@ -1,4 +1,4 @@
-package com.syouth.telegramapp.adapters;
+package com.syouth.telegram_charts.adapters;
 
 import android.content.res.ColorStateList;
 import android.support.annotation.NonNull;
@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.syouth.telegramapp.R;
-import com.syouth.telegramapp.view.GraphView;
+import com.syouth.telegram_charts.R;
+import com.syouth.telegram_charts.view.GraphView;
 
 import java.util.List;
 import java.util.Objects;

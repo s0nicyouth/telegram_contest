@@ -1,4 +1,4 @@
-package com.syouth.telegramapp.view;
+package com.syouth.telegram_charts.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -16,7 +16,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.syouth.telegramapp.math.Common;
+import com.syouth.telegram_charts.math.Common;
 
 import java.util.Arrays;
 import java.util.List;

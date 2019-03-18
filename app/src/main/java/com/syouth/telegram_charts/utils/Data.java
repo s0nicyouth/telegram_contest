@@ -1,10 +1,10 @@
-package com.syouth.telegramapp.utils;
+package com.syouth.telegram_charts.utils;
 
 import android.content.res.AssetManager;
 
-import com.syouth.telegramapp.json.Chart;
-import com.syouth.telegramapp.json.JsonParser;
-import com.syouth.telegramapp.view.GraphView;
+import com.syouth.telegram_charts.json.Chart;
+import com.syouth.telegram_charts.json.JsonParser;
+import com.syouth.telegram_charts.view.GraphView;
 
 import org.json.JSONException;
 

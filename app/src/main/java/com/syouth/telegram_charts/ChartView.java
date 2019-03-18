@@ -1,4 +1,4 @@
-package com.syouth.telegramapp;
+package com.syouth.telegram_charts;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,11 +9,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.syouth.telegramapp.controllers.ChartController;
-import com.syouth.telegramapp.view.GraphView;
-import com.syouth.telegramapp.view.SliderView;
-import com.syouth.telegramapp.views.GraphsView;
-import com.syouth.telegramapp.views.SummaryRenderer;
+import com.syouth.telegram_charts.controllers.ChartController;
+import com.syouth.telegram_charts.view.GraphView;
+import com.syouth.telegram_charts.view.SliderView;
+import com.syouth.telegram_charts.views.GraphsView;
+import com.syouth.telegram_charts.views.SummaryRenderer;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

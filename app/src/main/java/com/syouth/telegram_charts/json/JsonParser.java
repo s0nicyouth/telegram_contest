@@ -1,4 +1,4 @@
-package com.syouth.telegramapp.json;
+package com.syouth.telegram_charts.json;
 
 import org.json.JSONArray;
 import org.json.JSONException;

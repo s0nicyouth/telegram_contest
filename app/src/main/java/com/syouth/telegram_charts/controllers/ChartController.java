@@ -1,15 +1,15 @@
-package com.syouth.telegramapp.controllers;
+package com.syouth.telegram_charts.controllers;
 
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 
-import com.syouth.telegramapp.adapters.ChartsAdapter;
-import com.syouth.telegramapp.utils.Data;
-import com.syouth.telegramapp.view.GraphView;
-import com.syouth.telegramapp.view.SliderView;
-import com.syouth.telegramapp.views.GraphsView;
+import com.syouth.telegram_charts.adapters.ChartsAdapter;
+import com.syouth.telegram_charts.utils.Data;
+import com.syouth.telegram_charts.view.GraphView;
+import com.syouth.telegram_charts.view.SliderView;
+import com.syouth.telegram_charts.views.GraphsView;
 
 import java.util.List;
 

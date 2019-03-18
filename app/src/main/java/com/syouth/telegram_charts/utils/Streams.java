@@ -1,4 +1,4 @@
-package com.syouth.telegramapp.utils;
+package com.syouth.telegram_charts.utils;
 
 import java.io.IOException;
 import java.io.InputStream;

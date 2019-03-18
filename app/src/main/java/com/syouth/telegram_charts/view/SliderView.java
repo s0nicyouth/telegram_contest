@@ -1,4 +1,4 @@
-package com.syouth.telegramapp.view;
+package com.syouth.telegram_charts.view;
 
 import android.content.Context;
 import android.graphics.Canvas;

@@ -1,4 +1,4 @@
-package com.syouth.telegramapp.views;
+package com.syouth.telegram_charts.views;
 
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
@@ -8,9 +8,9 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.syouth.telegramapp.R;
-import com.syouth.telegramapp.view.GraphView;
-import com.syouth.telegramapp.view.SummaryView;
+import com.syouth.telegram_charts.R;
+import com.syouth.telegram_charts.view.GraphView;
+import com.syouth.telegram_charts.view.SummaryView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

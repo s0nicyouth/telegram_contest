@@ -1,4 +1,4 @@
-package com.syouth.telegramapp.json;
+package com.syouth.telegram_charts.json;
 
 import java.util.List;
 import java.util.Map;

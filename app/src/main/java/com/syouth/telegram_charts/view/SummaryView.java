@@ -1,4 +1,4 @@
-package com.syouth.telegramapp.view;
+package com.syouth.telegram_charts.view;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.syouth.telegramapp.R;
+import com.syouth.telegram_charts.R;
 
 import java.util.Objects;
 

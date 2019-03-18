@@ -1,9 +1,9 @@
-package com.syouth.telegramapp.utils;
+package com.syouth.telegram_charts.utils;
 
 import android.graphics.Color;
 
-import com.syouth.telegramapp.json.Chart;
-import com.syouth.telegramapp.view.GraphView;
+import com.syouth.telegram_charts.json.Chart;
+import com.syouth.telegram_charts.view.GraphView;
 
 import java.util.ArrayList;
 import java.util.List;

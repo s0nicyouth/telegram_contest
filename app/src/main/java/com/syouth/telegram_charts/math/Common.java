@@ -1,4 +1,4 @@
-package com.syouth.telegramapp.math;
+package com.syouth.telegram_charts.math;
 
 public class Common {
     public static long[] findMaxMin(long[] vals) {

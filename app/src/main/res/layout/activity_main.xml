@@ -20,11 +20,11 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="6" >
-            <com.syouth.telegramapp.view.SummaryView
+            <com.syouth.telegram_charts.view.SummaryView
                 android:id="@+id/summary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-            <com.syouth.telegramapp.view.GraphView
+            <com.syouth.telegram_charts.view.GraphView
                 android:id="@+id/graph"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"/>
@@ -34,11 +34,11 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
-            <com.syouth.telegramapp.view.GraphView
+            <com.syouth.telegram_charts.view.GraphView
                 android:id="@+id/slided_graph"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-            <com.syouth.telegramapp.view.SliderView
+            <com.syouth.telegram_charts.view.SliderView
                 android:id="@+id/slider"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
