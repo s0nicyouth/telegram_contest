@@ -32,7 +32,8 @@ public class GraphView extends View implements View.OnTouchListener {
     private static final int CIRCLE_RADIUS = 4; // dp
 
     private static final int NUMBER_OF_LEVEL_LINES = 5;
-    private static final int NUMBER_OF_X_MARKS = 5;
+    private static final int MIN_NUMBER_OF_X_MARKS = 4;
+    private static final int MAX_NUMBER_OF_X_MARKS = 6;
 
     /**
      * Describes position in {@link Chart#x} closest to touch.
@@ -143,6 +144,7 @@ public class GraphView extends View implements View.OnTouchListener {
         mMaxY = (long) val;
         super.invalidate();
     };
+    private final int mScreenWidth = getResources().getDisplayMetrics().widthPixels;
 
     private float[] mPointsToDraw;
 
@@ -579,16 +581,36 @@ public class GraphView extends View implements View.OnTouchListener {
         }
     }
 
+    private float getNumberOfXMarks() {
+        float totalRatioLeft = 1 - (mLeftRatio + mRightRatio);
+        return totalRatioLeft * (MAX_NUMBER_OF_X_MARKS - MIN_NUMBER_OF_X_MARKS)
+                + MIN_NUMBER_OF_X_MARKS;
+    }
+
+    private long getDistanceFromCenter() {
+        long currentMinX = getMinXConsideringRatio();
+        long currentMaxX = getMaxXConsideringRatio();
+        long center = (mMaxX + mMinX) / 2;
+        long gapCenter = (currentMaxX + currentMinX) / 2;
+        return gapCenter - center;
+    }
+
     private void drawXMarks(Canvas canvas) {
         long minX = getMinXConsideringRatio();
         long maxX = getMaxXConsideringRatio();
         float pixelsPerValX = getPixelPerValRatioX(maxX, minX);
-        long gap = ((maxX - minX) / NUMBER_OF_X_MARKS);
-        for (int i = 0; i < NUMBER_OF_X_MARKS; i++) {
-            canvas.drawText(
-                    String.valueOf(mXInterpolator.interpolate(minX + i * gap)),
-                    i * gap * pixelsPerValX, getHeight() - (mBottomPadding / 2f),
-                    mTextPaint);
+        float numberOfMarks = getNumberOfXMarks();
+        long gap = (long) ((maxX - minX) / numberOfMarks);
+        long shift = getDistanceFromCenter() % gap;
+        int roundedNumberOfMarks = (int) Math.ceil(numberOfMarks);
+        for (int i = -1; i < roundedNumberOfMarks + 1; i++) {
+            float xPosition = i * gap * pixelsPerValX - shift * pixelsPerValX;
+            if (xPosition <= mScreenWidth) {
+                canvas.drawText(
+                        String.valueOf(mXInterpolator.interpolate(-shift + minX + i * gap)),
+                        xPosition, getHeight() - (mBottomPadding / 2f),
+                        mTextPaint);
+            }
         }
     }
 
