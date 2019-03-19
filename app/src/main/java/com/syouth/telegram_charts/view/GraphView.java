@@ -601,6 +601,10 @@ public class GraphView extends View implements View.OnTouchListener {
         float pixelsPerValX = getPixelPerValRatioX(maxX, minX);
         float numberOfMarks = getNumberOfXMarks();
         long gap = (long) ((maxX - minX) / numberOfMarks);
+        // No charts to draw.
+        if (gap == 0) {
+            return;
+        }
         long shift = getDistanceFromCenter() % gap;
         int roundedNumberOfMarks = (int) Math.ceil(numberOfMarks);
         for (int i = -1; i < roundedNumberOfMarks + 1; i++) {
