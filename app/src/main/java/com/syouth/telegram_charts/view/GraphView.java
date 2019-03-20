@@ -115,6 +115,9 @@ public class GraphView extends View implements View.OnTouchListener {
 
     private float mLeftRatio = 0f;
     private float mRightRatio = 0f;
+    private float mYShiftPixels = 0f;
+    private boolean mUp = false;
+    private long mYGapPixels = 0;
 
     private final Paint mPaint = new Paint();
     private final Paint mLinesPaint = new Paint();
@@ -126,11 +129,13 @@ public class GraphView extends View implements View.OnTouchListener {
     private final ValueAnimator.AnimatorListener mAnimatorListener = new AnimatorListenerAdapter() {
         @Override
         public void onAnimationCancel(Animator animation) {
+            mYShiftPixels = 0f;
             invalidate();
         }
 
         @Override
         public void onAnimationEnd(Animator animation) {
+            mYShiftPixels = 0f;
             invalidate();
         }
     };
@@ -142,6 +147,7 @@ public class GraphView extends View implements View.OnTouchListener {
     private final ValueAnimator.AnimatorUpdateListener mMaxYUpdateListener = animation -> {
         float val = (float) animation.getAnimatedValue();
         mMaxY = (long) val;
+        mYShiftPixels = mUp ? -mYGapPixels * animation.getAnimatedFraction() : mYGapPixels * animation.getAnimatedFraction();
         super.invalidate();
     };
     private final int mScreenWidth = getResources().getDisplayMetrics().widthPixels;
@@ -238,6 +244,7 @@ public class GraphView extends View implements View.OnTouchListener {
         mMaxY = maxMinY[0];
         mMinY = maxMinY[1] < 0 ? maxMinY[1] : 0;
         if ((mMaxYAnimator == null || !mMaxYAnimator.isRunning()) && prevMaxY != mMaxY) {
+            mUp = prevMaxY <= mMaxY;
             mMaxYAnimator = ValueAnimator.ofFloat(prevMaxY, mMaxY);
             mMaxYAnimator.setDuration(500);
             mMaxYAnimator.addUpdateListener(mMaxYUpdateListener);
@@ -385,11 +392,9 @@ public class GraphView extends View implements View.OnTouchListener {
                 CIRCLE_RADIUS,
                 getResources().getDisplayMetrics());
 
-        mPaint.setColor(Color.RED);
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(mStrokeWidth);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
 
         mLinesPaint.setColor(Color.GRAY);
@@ -567,17 +572,31 @@ public class GraphView extends View implements View.OnTouchListener {
     }
 
     private void drawLevelLines(Canvas canvas) {
-        long gap = ((mMaxY - mMinY) / NUMBER_OF_LEVEL_LINES);
-        for (int i = 0; i <= NUMBER_OF_LEVEL_LINES; i++) {
-            canvas.drawText(String.valueOf(mMinY + gap * i),
-                    0f,
-                    getHeight() - (yIntervalToPixels(gap * i) + mLevelValuePadding),
-                    mTextPaint);
-            canvas.drawLine(
-                    0f,
-                    getHeight() - yIntervalToPixels(i * gap),
-                    getWidth(), getHeight() - yIntervalToPixels(gap * i),
-                    mLinesPaint);
+        long gap = (long) (mYGapPixels / getPixelPerValRatioY());
+        long valsShift = (long) (mYShiftPixels / getPixelPerValRatioY());
+        canvas.drawText(String.valueOf(mMinY),
+                0f,
+                getHeight() - (yIntervalToPixelsConsideringPadding(0) + mLevelValuePadding),
+                mTextPaint);
+        canvas.drawLine(
+                0f,
+                getHeight() - yIntervalToPixelsConsideringPadding(0),
+                getWidth(), getHeight() - yIntervalToPixelsConsideringPadding(0),
+                mLinesPaint);
+        for (int i = 0; i <= NUMBER_OF_LEVEL_LINES + 1; i++) {
+            float lineY = getHeight() - yIntervalToPixelsConsideringPadding(gap * i)
+                    - mYShiftPixels;
+            if (lineY > mBottomPadding && lineY < getHeight() - mTopPadding) {
+                canvas.drawText(String.valueOf(mMinY + gap * i + valsShift),
+                        0f,
+                        getHeight() - (yIntervalToPixelsConsideringPadding(gap * i) + mLevelValuePadding) - mYShiftPixels,
+                        mTextPaint);
+                canvas.drawLine(
+                        0f,
+                        lineY,
+                        getWidth(), lineY,
+                        mLinesPaint);
+            }
         }
     }
 
@@ -652,7 +671,7 @@ public class GraphView extends View implements View.OnTouchListener {
         return (y - mMinY) * ratio + mBottomPadding;
     }
 
-    private float yIntervalToPixels(long interval) {
+    private float yIntervalToPixelsConsideringPadding(long interval) {
         float ratio = getPixelPerValRatioY();
         return interval * ratio + mBottomPadding;
     }
@@ -729,5 +748,10 @@ public class GraphView extends View implements View.OnTouchListener {
         updateMaxMinX();
         updateMaxMinY();
         super.invalidate();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        mYGapPixels = (long) (getRealHeight() / NUMBER_OF_LEVEL_LINES);
     }
 }
