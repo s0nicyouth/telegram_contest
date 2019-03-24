@@ -27,13 +27,12 @@ public class GraphView extends View implements View.OnTouchListener {
     private static final int BOTTOM_PADDING = 50; // dp
     private static final int TOP_PADDING = 50; //dp
     private static final int LEVEL_VALUE_PADDING = 5; // dp
-    private static final int TEXT_SIZE = 12; // sp
+    private static final int TEXT_SIZE = 9; // sp
     private static final int STROKE_WIDTH = 2; // dp
     private static final int CIRCLE_RADIUS = 4; // dp
+    private static final int MIN_GAP_PERIOD = 110; // dp
 
     private static final int NUMBER_OF_LEVEL_LINES = 5;
-    private static final int MIN_NUMBER_OF_X_MARKS = 4;
-    private static final int MAX_NUMBER_OF_X_MARKS = 6;
 
     /**
      * Describes position in {@link Chart#x} closest to touch.
@@ -43,7 +42,7 @@ public class GraphView extends View implements View.OnTouchListener {
         public int closestPosition;
         public float positionXInView;
 
-        public ChartDetails(Chart chart, int closestPosition, float positionXInView) {
+        private ChartDetails(Chart chart, int closestPosition, float positionXInView) {
             this.chart = chart;
             this.closestPosition = closestPosition;
             this.positionXInView = positionXInView;
@@ -159,6 +158,8 @@ public class GraphView extends View implements View.OnTouchListener {
     private int mLevelValuePadding;
     private int mCircleRadius;
     private int mStrokeWidth;
+    private int mPixelsPerRatio = mScreenWidth;
+    private int mMinGapPeriod;
 
     private boolean mJustDrawGraph = false;
 
@@ -391,6 +392,9 @@ public class GraphView extends View implements View.OnTouchListener {
         mCircleRadius = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 CIRCLE_RADIUS,
                 getResources().getDisplayMetrics());
+        mMinGapPeriod = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                MIN_GAP_PERIOD,
+                getResources().getDisplayMetrics());
 
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.STROKE);
@@ -543,6 +547,9 @@ public class GraphView extends View implements View.OnTouchListener {
     private int constructPoints(long[] yVals, long[] xs) {
         int posToDrawFrom = getFirstVisibleXPosition(xs, getMinXConsideringRatio());
         int posToDrawTo = getLastVisibleXPosition(xs, getMaxXConsideringRatio());
+        if (posToDrawFrom >= posToDrawTo) {
+            return 0;
+        }
         mPointsToDraw[0] = getPixelsXByPlotX(xs[posToDrawFrom]);
         mPointsToDraw[1] = getHeight() - getPixelsYByPlotY(yVals[posToDrawFrom]);
         mPointsToDraw[2] = getPixelsXByPlotX(xs[posToDrawFrom + 1]);
@@ -572,7 +579,8 @@ public class GraphView extends View implements View.OnTouchListener {
     }
 
     private void drawLevelLines(Canvas canvas) {
-        long gap = (long) (mYGapPixels / getPixelPerValRatioY());
+        mTextPaint.setAlpha(255);
+        float gap = mYGapPixels / getPixelPerValRatioY();
         long valsShift = (long) (mYShiftPixels / getPixelPerValRatioY());
         canvas.drawText(String.valueOf(mMinY),
                 0f,
@@ -584,12 +592,12 @@ public class GraphView extends View implements View.OnTouchListener {
                 getWidth(), getHeight() - yIntervalToPixelsConsideringPadding(0),
                 mLinesPaint);
         for (int i = 0; i <= NUMBER_OF_LEVEL_LINES + 1; i++) {
-            float lineY = getHeight() - yIntervalToPixelsConsideringPadding(gap * i)
+            float lineY = getHeight() - yIntervalToPixelsConsideringPadding((long) (gap * i))
                     - mYShiftPixels;
             if (lineY > mBottomPadding && lineY < getHeight() - mTopPadding) {
-                canvas.drawText(String.valueOf(mMinY + gap * i + valsShift),
+                canvas.drawText(String.valueOf(mMinY + (long)(gap * i) + valsShift),
                         0f,
-                        getHeight() - (yIntervalToPixelsConsideringPadding(gap * i) + mLevelValuePadding) - mYShiftPixels,
+                        getHeight() - (yIntervalToPixelsConsideringPadding((long) (gap * i)) + mLevelValuePadding) - mYShiftPixels,
                         mTextPaint);
                 canvas.drawLine(
                         0f,
@@ -600,12 +608,6 @@ public class GraphView extends View implements View.OnTouchListener {
         }
     }
 
-    private float getNumberOfXMarks() {
-        float totalRatioLeft = 1 - (mLeftRatio + mRightRatio);
-        return totalRatioLeft * (MAX_NUMBER_OF_X_MARKS - MIN_NUMBER_OF_X_MARKS)
-                + MIN_NUMBER_OF_X_MARKS;
-    }
-
     private long getDistanceFromCenter() {
         long currentMinX = getMinXConsideringRatio();
         long currentMaxX = getMaxXConsideringRatio();
@@ -614,26 +616,35 @@ public class GraphView extends View implements View.OnTouchListener {
         return gapCenter - center;
     }
 
+    private float getMarksPerPeriod() {
+        float curPeriod = mMinGapPeriod + mPixelsPerRatio * (mLeftRatio + mRightRatio);
+        return curPeriod / mMinGapPeriod;
+    }
+
+    private float getCurPeriod() {
+        return mMinGapPeriod + mPixelsPerRatio * (mLeftRatio + mRightRatio);
+    }
+
     private void drawXMarks(Canvas canvas) {
-        long minX = getMinXConsideringRatio();
-        long maxX = getMaxXConsideringRatio();
-        float pixelsPerValX = getPixelPerValRatioX(maxX, minX);
-        float numberOfMarks = getNumberOfXMarks();
-        long gap = (long) ((maxX - minX) / numberOfMarks);
-        // No charts to draw.
-        if (gap == 0) {
-            return;
-        }
-        long shift = getDistanceFromCenter() % gap;
-        int roundedNumberOfMarks = (int) Math.ceil(numberOfMarks);
-        for (int i = -1; i < roundedNumberOfMarks + 1; i++) {
-            float xPosition = i * gap * pixelsPerValX - shift * pixelsPerValX;
-            if (xPosition <= mScreenWidth) {
-                canvas.drawText(
-                        String.valueOf(mXInterpolator.interpolate(-shift + minX + i * gap)),
-                        xPosition, getHeight() - (mBottomPadding / 2f),
-                        mTextPaint);
+        float pixelPerValRatioX = getPixelPerValRatioX(getMaxXConsideringRatio(), getMinXConsideringRatio());
+        float marksPerPeriod = getMarksPerPeriod();
+        float curPeriod = getCurPeriod();
+        float pixelsPerMarks = (float) (curPeriod / Math.pow(2, Math.floor(marksPerPeriod)));
+        int shift = (int) (getDistanceFromCenter() * pixelPerValRatioX % curPeriod);
+        float xPosition = -shift - curPeriod;
+        int count = 0;
+        while (xPosition < mScreenWidth) {
+            if (count++ % 2 != 0) {
+                float ratio = (float) (marksPerPeriod - Math.floor(marksPerPeriod));
+                mTextPaint.setAlpha((int) (255 * ratio));
+            } else {
+                mTextPaint.setAlpha(255);
             }
+            canvas.drawText(
+                    String.valueOf(mXInterpolator.interpolate((long) (getMinXConsideringRatio() + (xPosition / pixelPerValRatioX)))),
+                    xPosition, getHeight() - (mBottomPadding / 2f),
+                    mTextPaint);
+            xPosition += pixelsPerMarks;
         }
     }
 
